@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{{ name }} — AI Networking Card</title>
+  <style>
+    body {
+      background-color: #0f1117;
+      color: #00ffae;
+      font-family: "Courier New", monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .terminal {
+      border: 1px solid #00ffae;
+      border-radius: 16px;
+      background-color: #0a0c12;
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 0 20px #00ffae55;
+      line-height: 1.6;
+      overflow: hidden;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #00ffae33;
+      margin: 12px 0;
+    }
+
+    a {
+      color: #00d4ff;
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .blink {
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+
+    .hidden {
+      visibility: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="terminal" id="terminal">
+    <p class="hidden">> Booting up FastAPI handshake sequence...</p>
+    <p class="hidden">> Verifying connection integrity...</p>
+    <p class="hidden">> Connection established — <strong>thanks for the tap 🙌</strong></p>
+    <p class="hidden">> You’re my <strong>#{{ session_id }}</strong> tap today!</p>
+    <p class="hidden">> Timestamp: <strong>{{ timestamp }}</strong></p>
+
+    <hr class="hidden" />
+
+    <p class="hidden"><strong>🤖 AI Fact:</strong> {{ fact }}</p>
+    <p class="hidden" style="font-size: 0.9em; color: #00d4ff;">Source: {{ source }}</p>
+
+    <hr class="hidden" />
+
+    <p class="hidden"><strong>{{ name }}</strong> — {{ title }}</p>
+    <p class="hidden"><a href="mailto:{{ email }}">{{ email }}</a></p>
+    <p class="hidden">
+      <a href="{{ linkedin }}" target="_blank">LinkedIn</a> |
+      <a href="{{ github }}" target="_blank">GitHub</a> |
+      <a href="/static/victor_loza.vcf" download>Save Contact (.vcf)</a>
+    </p>
+
+    <p class="hidden"><em>> Session complete — channel stays open for collaboration. Enjoy DevFest! 🚀</em></p>
+    <p class="blink" id="cursor">_</p>
+  </div>
+
+  <script>
+    // Typing animation engine
+    document.addEventListener("DOMContentLoaded", () => {
+      const terminal = document.getElementById("terminal");
+      const lines = terminal.querySelectorAll("p, hr");
+      const cursor = document.getElementById("cursor");
+
+      let lineIndex = 0;
+      let typingSpeed = 20; // ms per character
+
+      // Function to type out a line's text progressively
+      function typeLine(line, next) {
+        line.classList.remove("hidden");
+
+        // Skip HR tags (just show them immediately)
+        if (line.tagName.toLowerCase() === "hr") {
+          setTimeout(next, 200);
+          return;
+        }
+
+        const fullText = line.innerHTML;
+        line.innerHTML = "";
+        let i = 0;
+
+        const typer = setInterval(() => {
+          line.innerHTML = fullText.slice(0, i) + '<span class="blink">_</span>';
+          i++;
+          if (i > fullText.length) {
+            clearInterval(typer);
+            line.innerHTML = fullText; // finalize line
+            setTimeout(next, 300); // short pause before next line
+          }
+        }, typingSpeed);
+      }
+
+      // Recursive sequence typing
+      function typeNextLine() {
+        if (lineIndex < lines.length) {
+          typeLine(lines[lineIndex], () => {
+            lineIndex++;
+            typeNextLine();
+          });
+        } else {
+          cursor.style.display = "inline-block"; // end cursor blink
+        }
+      }
+
+      // Start sequence
+      cursor.style.display = "none"; // hide until end
+      typeNextLine();
+    });
+  </script>
+</body>
+</html>

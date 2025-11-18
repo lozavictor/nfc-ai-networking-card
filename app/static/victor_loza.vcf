@@ -1,0 +1,10 @@
+BEGIN:VCARD
+VERSION:3.0
+N:Loza;Victor;;;
+FN:Victor Loza
+TITLE:Junior Back-End Developer
+EMAIL;TYPE=INTERNET:Loza.Victor@outlook.com
+TEL;TYPE=CELL:+1-336-521-2073
+URL;TYPE=LinkedIn:https://linkedin.com/in/lozavictor
+URL;TYPE=GitHub:https://github.com/lozavictor
+END:VCARD
