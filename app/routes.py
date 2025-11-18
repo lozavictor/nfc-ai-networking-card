@@ -10,10 +10,44 @@ router = APIRouter()
 templates = Jinja2Templates(directory="app/templates")
 
 
-@router.get("/")
-def root():
-    """Root endpoint to verify API status."""
-    return {"message": "NFC AI Networking Card is live!"}
+@router.get("/", response_class=HTMLResponse)
+def root(request: Request):
+    """
+    Root route — renders the NFC card page directly.
+    """
+    try:
+        # Increment Redis counter
+        total_taps = redis_client.incr("tap_counter")
+
+        # Generate AI fact
+        fact = generate_ai_fact()
+        ai_source = "Gemini 2.5 Flash"
+
+        # Build context for Jinja2 template
+        context = {
+            "request": request,
+            "session_id": total_taps,
+            "timestamp": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC"),
+            "fact": fact,
+            "source": ai_source,
+            "name": "Victor Loza",
+            "title": "Junior Back-End Developer",
+            "email": "Loza.Victor@outlook.com",
+            "linkedin": "https://linkedin.com/in/lozavictor",
+            "github": "https://github.com/lozavictor",
+        }
+
+        return templates.TemplateResponse("card.html", context)
+
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={
+                "error": "Root route failed",
+                "details": str(e),
+                "hint": "Check Redis or Gemini API availability.",
+            },
+        )
 
 
 @router.get("/tap", response_class=HTMLResponse)
@@ -25,14 +59,14 @@ def tap(request: Request):
     - Renders the interactive card template
     """
     try:
-        #Increment Redis counter
+        # Increment Redis counter
         total_taps = redis_client.incr("tap_counter")
 
-        #Generate AI fact
+        # Generate AI fact
         fact = generate_ai_fact()
         ai_source = "Gemini 2.5 Flash"
 
-        #Build context for Jinja2 template
+        # Build context for Jinja2 template
         context = {
             "request": request,
             "session_id": total_taps,
@@ -77,7 +111,7 @@ def stats():
 def get_ai_fact():
     """
     Standalone endpoint to fetch AI-generated fact and source.
-    Used API health checks and debugging Gemini output.
+    Used for API health checks and debugging Gemini output.
     """
     try:
         fact = generate_ai_fact()
@@ -88,4 +122,3 @@ def get_ai_fact():
             "details": str(e),
             "hint": "Verify Gemini API key or rate limits.",
         }
-
